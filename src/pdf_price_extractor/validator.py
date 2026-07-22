@@ -1,0 +1,1 @@
+"""Validate normalized product records."""
