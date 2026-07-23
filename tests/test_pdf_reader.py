@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from pdf_price_extractor.pdf_reader import get_page_count, extract_page_text
+from pdf_price_extractor.pdf_reader import get_page_count, extract_page_text, extract_document_text
 
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
@@ -31,3 +31,14 @@ def test_extract_page_text():
     assert isinstance(text, str)
     assert "Kanso Desk Lamp" in text
     assert "Page 2" not in text
+
+
+def test_extract_document_text():
+    pdf_path = FIXTURES_DIR / "sample.pdf"
+
+    result = extract_document_text(pdf_path)
+    assert isinstance(result, str)
+    assert "Page 1" in result
+    assert "Page 2" in result
+    assert "Kanso Desk Lamp" in result
+    assert "Yuki Side Table" in result

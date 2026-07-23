@@ -24,3 +24,17 @@ def extract_page_text(pdf_path, page_number):
 
         return text 
 
+def extract_document_text(pdf_path):
+    path = Path(pdf_path)
+
+    if not path.exists():
+        raise FileNotFoundError(f"PDF file not found: {path}")
+
+    result = []
+    with pymupdf.open(pdf_path) as document:
+        for page in document:
+            text = page.get_text()
+            result.append(text)
+
+        return "\n".join(result)
+
