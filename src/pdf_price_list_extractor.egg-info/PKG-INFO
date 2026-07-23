@@ -1,0 +1,21 @@
+Metadata-Version: 2.4
+Name: pdf-price-list-extractor
+Version: 0.1.0
+Summary: Extract structured product data from PDF price lists
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: PyMuPDF<2,>=1.26
+Requires-Dist: pydantic<3,>=2.11
+Requires-Dist: openpyxl<4,>=3.1
+Provides-Extra: dev
+Requires-Dist: pytest<9,>=8.4; extra == "dev"
+
+# PDF Price List Extractor
+
+A learning project for extracting structured product data from PDF price lists.
+
+## Planned pipeline
+
+PDF → extract → parse → normalize → validate → export
+
+The project is currently in the setup and exploration stage.

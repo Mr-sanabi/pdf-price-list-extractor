@@ -1,0 +1,6 @@
+PyMuPDF<2,>=1.26
+pydantic<3,>=2.11
+openpyxl<4,>=3.1
+
+[dev]
+pytest<9,>=8.4
