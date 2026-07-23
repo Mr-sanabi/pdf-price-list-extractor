@@ -12,3 +12,15 @@ def get_page_count(pdf_path):
     with pymupdf.open(path) as document:
         return document.page_count
 
+def extract_page_text(pdf_path, page_number):
+    path = Path(pdf_path)
+
+    if not path.exists():
+        raise FileNotFoundError(f"PDF file not found: {path}")
+
+    with pymupdf.open(pdf_path) as document:
+        page = document.load_page(page_number)
+        text = page.get_text()
+
+        return text 
+
