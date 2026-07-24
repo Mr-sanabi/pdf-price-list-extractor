@@ -50,3 +50,31 @@ def split_row_into_columns(row, column_boundaries):
         columns[column_index].append(word_text)
 
     return [" ".join(column) for column in columns]
+
+
+def extract_table_rows(rows, column_boundaries):
+    table_rows = []
+    header_found = False
+    expected_header = [
+        "SKU",
+        "PRODUCT",
+        "DIMENSIONS",
+        "WEIGHT",
+        "POWER",
+        "PRICE",
+    ]
+
+    for row in rows:
+        columns = split_row_into_columns(row, column_boundaries)
+
+        if not header_found:
+            if columns == expected_header:
+                header_found = True
+
+            continue
+
+        if columns[0] and columns[5]:
+            table_rows.append(columns)
+
+    return table_rows
+                

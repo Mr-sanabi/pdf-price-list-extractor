@@ -1,4 +1,4 @@
-from pdf_price_extractor.table_extractor import group_words_into_rows, split_row_into_columns
+from pdf_price_extractor.table_extractor import group_words_into_rows, split_row_into_columns, extract_table_rows
 from pdf_price_extractor.pdf_reader import extract_page_words
 from pathlib import Path
 
@@ -54,3 +54,24 @@ def test_split_row_into_columns():
         "12 W",
         "PLN 349.00",
     ]
+
+def test_extract_table_rows_from_pdf():
+    pdf_path = FIXTURES_DIR / "sample.pdf"
+    words = extract_page_words(pdf_path, 0)
+    rows = group_words_into_rows(words, y_tolerance=3)
+    result = extract_table_rows(
+        rows,
+        [170, 350, 470, 550, 630],
+    )
+    assert len(result) == 5
+
+    assert result[0] == [
+        "LMP-1001",
+        "Kanso Desk Lamp",
+        "42 x 18 x 55 cm",
+        "2.4 kg",
+        "12 W",
+        "PLN 349.00",
+    ]
+
+    assert all(len(product) == 6 for product in result)
