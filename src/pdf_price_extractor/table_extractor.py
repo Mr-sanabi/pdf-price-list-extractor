@@ -1,4 +1,4 @@
-# """Extract table-like data from PDF pages."""
+"""Extract table-like data from PDF pages."""
 
 def group_words_into_rows(words, y_tolerance=3):
     if not words:
@@ -31,3 +31,22 @@ def group_words_into_rows(words, y_tolerance=3):
     last_sorted = sorted(current_row, key=lambda word: word[0])
     rows.append(last_sorted)
     return rows
+
+
+def split_row_into_columns(row, column_boundaries):
+    columns = [[] for _ in range(len(column_boundaries) + 1)]
+
+    for word in row:
+        word_x = word[0]
+        word_text = word[4]
+        column_index = 0
+
+        for boundary in column_boundaries:
+            if word_x < boundary:
+                break
+
+            column_index += 1
+
+        columns[column_index].append(word_text)
+
+    return [" ".join(column) for column in columns]

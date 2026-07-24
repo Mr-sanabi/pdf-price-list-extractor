@@ -1,6 +1,5 @@
 """Tests for pdf_reader."""
 
-
 from pathlib import Path
 
 import pytest
