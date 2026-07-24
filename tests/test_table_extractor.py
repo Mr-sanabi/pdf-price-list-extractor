@@ -1,4 +1,4 @@
-from pdf_price_extractor.table_extractor import group_words_into_rows, split_row_into_columns, extract_table_rows
+from pdf_price_extractor.table_extractor import group_words_into_rows, split_row_into_columns, extract_table_rows, extract_table_from_page
 from pdf_price_extractor.pdf_reader import extract_page_words
 from pathlib import Path
 
@@ -74,4 +74,12 @@ def test_extract_table_rows_from_pdf():
         "PLN 349.00",
     ]
 
+    assert all(len(product) == 6 for product in result)
+
+def test_extract_table_from_page():
+    pdf_path = FIXTURES_DIR / "sample.pdf"
+    result = extract_table_from_page(pdf_path, page_number=0, column_boundaries=[170, 350, 470, 550, 630], y_tolerance=3)
+    assert len(result) == 5
+    assert result[0][0] == "LMP-1001"
+    assert result[-1][0] == "SHF-5205"
     assert all(len(product) == 6 for product in result)

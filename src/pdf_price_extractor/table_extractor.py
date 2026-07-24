@@ -1,5 +1,7 @@
 """Extract table-like data from PDF pages."""
 
+from pdf_price_extractor.pdf_reader import extract_page_words
+
 def group_words_into_rows(words, y_tolerance=3):
     if not words:
         return []
@@ -77,4 +79,15 @@ def extract_table_rows(rows, column_boundaries):
             table_rows.append(columns)
 
     return table_rows
-                
+
+
+def extract_table_from_page(
+    pdf_path,
+    page_number,
+    column_boundaries,
+    y_tolerance=3,
+):
+    words = extract_page_words(pdf_path, page_number)
+    rows = group_words_into_rows(words, y_tolerance)
+    table_rows = extract_table_rows(rows, column_boundaries)
+    return table_rows
