@@ -69,7 +69,7 @@ def extract_table_rows(rows, column_boundaries):
     for row in rows:
         columns = split_row_into_columns(row, column_boundaries)
 
-        if not header_found:
+        if not header_found: 
             if columns == expected_header:
                 header_found = True
 
