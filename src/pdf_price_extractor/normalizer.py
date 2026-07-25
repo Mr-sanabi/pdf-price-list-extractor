@@ -9,6 +9,12 @@ def row_to_record(row):
         "power",
         "price_raw",
     ]
-    
+
     return dict(zip(keys, row))
-    
+
+def clean_text(value):
+
+    splited_value = value.split()
+    clean_value = " ".join(splited_value)
+
+    return clean_value

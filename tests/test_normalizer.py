@@ -1,6 +1,6 @@
 """Tests for normalizer."""
 
-from pdf_price_extractor.normalizer import row_to_record
+from pdf_price_extractor.normalizer import row_to_record, clean_text
 
 def test_row_to_record():
     row = [
@@ -22,3 +22,9 @@ def test_row_to_record():
         "power": "12 W",
         "price_raw": "PLN 349.00",
     }
+
+
+def test_clean_text():
+    assert clean_text("  Kanso   Desk\nLamp  ") == "Kanso Desk Lamp"
+    assert clean_text("\t42 x 18 x 55 cm\n") == "42 x 18 x 55 cm"
+    assert clean_text("") == ""
