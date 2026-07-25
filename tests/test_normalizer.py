@@ -1,6 +1,6 @@
 """Tests for normalizer."""
 
-from pdf_price_extractor.normalizer import row_to_record, clean_text, parse_price
+from pdf_price_extractor.normalizer import row_to_record, clean_text, parse_price, is_valid_record, split_records
 
 def test_row_to_record():
     row = [
@@ -36,3 +36,38 @@ def test_parse_price():
     assert result == ("PLN", 349.00)
     assert isinstance(result[0], str)
     assert isinstance(result[1], float)
+
+
+def test_is_valid_record():
+    valid_record = {
+        "sku": "LMP-1001",
+        "product": "Kanso Desk Lamp",
+        "dimensions": "42 x 18 x 55 cm",
+        "weight": "2.4 kg",
+        "power": "12 W",
+        "price_raw": "PLN 349.00",
+    }
+
+    invalid_record = valid_record.copy()
+    invalid_record["sku"] = "   "
+
+    assert is_valid_record(valid_record) is True
+    assert is_valid_record(invalid_record) is False
+
+
+def test_split_records():
+    valid_record = {
+        "sku": "LMP-1001",
+        "product": "Kanso Desk Lamp",
+        "dimensions": "42 x 18 x 55 cm",
+        "weight": "2.4 kg",
+        "power": "12 W",
+        "price_raw": "PLN 349.00",
+    }
+
+    invalid_record = valid_record.copy()
+    invalid_record["sku"] = "   "
+    accepted, rejected = split_records([valid_record, invalid_record])
+
+    assert accepted == [valid_record]
+    assert rejected == [invalid_record]
