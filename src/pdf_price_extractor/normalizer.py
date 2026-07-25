@@ -18,3 +18,9 @@ def clean_text(value):
     clean_value = " ".join(splited_value)
 
     return clean_value
+
+def parse_price(price_raw):
+    cleaned_price = clean_text(price_raw)
+    currency, amount_text = cleaned_price.split(maxsplit=1)
+    float_price = float(amount_text)
+    return currency, float_price

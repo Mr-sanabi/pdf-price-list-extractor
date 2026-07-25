@@ -1,6 +1,6 @@
 """Tests for normalizer."""
 
-from pdf_price_extractor.normalizer import row_to_record, clean_text
+from pdf_price_extractor.normalizer import row_to_record, clean_text, parse_price
 
 def test_row_to_record():
     row = [
@@ -28,3 +28,11 @@ def test_clean_text():
     assert clean_text("  Kanso   Desk\nLamp  ") == "Kanso Desk Lamp"
     assert clean_text("\t42 x 18 x 55 cm\n") == "42 x 18 x 55 cm"
     assert clean_text("") == ""
+
+
+def test_parse_price():
+    result = parse_price("PLN 349.00")
+
+    assert result == ("PLN", 349.00)
+    assert isinstance(result[0], str)
+    assert isinstance(result[1], float)
