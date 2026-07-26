@@ -1,6 +1,7 @@
-from pdf_price_extractor.exporter import export_to_csv, export_to_excel
+from pdf_price_extractor.exporter import export_to_csv, export_to_excel, export_records
 import csv
-from openpyxl import Workbook, load_workbook
+from openpyxl import load_workbook
+import pytest
 
 def test_export_to_csv(tmp_path):
     records = [
@@ -56,3 +57,51 @@ def test_export_to_excel(tmp_path):
     assert worksheet["B2"].value == "Kanso Desk Lamp"
     assert worksheet["G2"].value == "PLN"
     assert worksheet["H2"].value == 349.0
+
+
+def test_export_records_to_csv(tmp_path):
+    records = [
+        {
+            "sku": "LMP-1001",
+            "product": "Kanso Desk Lamp",
+            "dimensions": "42 x 18 x 55 cm",
+            "weight": "2.4 kg",
+            "power": "12 W",
+            "price_raw": "PLN 349.00",
+            "currency": "PLN",
+            "price": 349.0,
+        }
+    ]
+
+    output_path = tmp_path / "products.csv"
+
+    export_records(records, output_path)
+
+    assert output_path.exists()
+
+
+def test_export_records_to_excel(tmp_path):
+    records = [
+        {
+            "sku": "LMP-1001",
+            "product": "Kanso Desk Lamp",
+            "dimensions": "42 x 18 x 55 cm",
+            "weight": "2.4 kg",
+            "power": "12 W",
+            "price_raw": "PLN 349.00",
+            "currency": "PLN",
+            "price": 349.0,
+        }
+    ]
+
+    output_path = tmp_path / "products.xlsx"
+
+    export_records(records, output_path)
+
+    assert output_path.exists()
+
+def test_export_records_unsupported_format(tmp_path):
+    output_path = tmp_path / "products.txt"
+
+    with pytest.raises(ValueError, match="Unsupported output format"):
+        export_records([], output_path)

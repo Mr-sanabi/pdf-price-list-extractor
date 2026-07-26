@@ -2,6 +2,7 @@
 
 import csv
 from openpyxl import Workbook
+from pathlib import Path
 
 def export_to_csv(records, output_path):
     if not records:
@@ -47,3 +48,16 @@ def export_to_excel(records, output_path):
         worksheet.append(row)
 
     workbook.save(output_path)
+
+def export_records(records, output_path):
+    suffix = Path(output_path).suffix.lower()
+
+    if suffix == ".csv":
+        export_to_csv(records, output_path)
+
+    elif suffix == ".xlsx":
+        export_to_excel(records, output_path)
+
+    else:
+        raise ValueError(f"Unsupported output format: {suffix}")
+    
