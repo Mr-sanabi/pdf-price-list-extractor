@@ -1,5 +1,6 @@
-from pdf_price_extractor.exporter import export_to_csv
+from pdf_price_extractor.exporter import export_to_csv, export_to_excel
 import csv
+from openpyxl import Workbook, load_workbook
 
 def test_export_to_csv(tmp_path):
     records = [
@@ -25,3 +26,33 @@ def test_export_to_csv(tmp_path):
     assert rows[0]["sku"] == "LMP-1001"
     assert rows[0]["currency"] == "PLN"
     assert rows[0]["price"] == "349.0"
+
+
+def test_export_to_excel(tmp_path):
+    records = [
+        {
+            "sku": "LMP-1001",
+            "product": "Kanso Desk Lamp",
+            "dimensions": "42 x 18 x 55 cm",
+            "weight": "2.4 kg",
+            "power": "12 W",
+            "price_raw": "PLN 349.00",
+            "currency": "PLN",
+            "price": 349.0,
+        }
+    ]  
+
+    output_path = tmp_path / "products.xlsx"
+
+    export_to_excel(records, output_path)
+
+    assert output_path.exists()
+    workbook = load_workbook(output_path)
+    worksheet = workbook.active
+    assert worksheet["A1"].value == "sku"
+    assert worksheet["B1"].value == "product"
+    assert worksheet["H1"].value == "price"
+    assert worksheet["A2"].value == "LMP-1001"
+    assert worksheet["B2"].value == "Kanso Desk Lamp"
+    assert worksheet["G2"].value == "PLN"
+    assert worksheet["H2"].value == 349.0
