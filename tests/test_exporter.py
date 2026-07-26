@@ -1,7 +1,12 @@
-from pdf_price_extractor.exporter import export_to_csv, export_to_excel, export_records
 import csv
-from openpyxl import load_workbook
 import pytest
+
+from pdf_price_extractor.exporter import export_to_csv, export_to_excel, export_records
+from pdf_price_extractor.table_extractor import extract_table_from_page
+from pdf_price_extractor.normalizer import normalize_records
+from pdf_price_extractor.exporter import export_records
+from openpyxl import load_workbook
+from pathlib import Path
 
 def test_export_to_csv(tmp_path):
     records = [
@@ -135,3 +140,31 @@ def test_export_records_does_not_create_file_for_empty_records(tmp_path):
     export_records([], output_path)
 
     assert not output_path.exists()    
+
+
+def test_pdf_to_csv_pipeline(tmp_path):
+    FIXTURES_DIR = Path(__file__).parent / "fixtures"
+    pdf_path = FIXTURES_DIR / "sample.pdf"
+
+    rows = extract_table_from_page(
+        pdf_path,
+        page_number=0,
+        column_boundaries=[170, 350, 470, 550, 630]
+    )
+
+    accepted, rejected = normalize_records(rows)
+
+    output_path = tmp_path / "products.csv"
+    export_records(accepted, output_path)
+
+    assert len(accepted) == 5
+    assert len(rejected) == 0
+    assert output_path.exists()
+
+    with output_path.open(newline="", encoding="utf-8") as file:
+        exported_rows = list(csv.DictReader(file))
+
+    assert len(exported_rows) == 5
+    assert exported_rows[0]["sku"] == "LMP-1001"
+    assert exported_rows[0]["currency"] == "PLN"
+    assert exported_rows[0]["price"] == "349.0"

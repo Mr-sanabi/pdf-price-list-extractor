@@ -22,6 +22,7 @@ def clean_text(value):
 def parse_price(price_raw):
     cleaned_price = clean_text(price_raw)
     currency, amount_text = cleaned_price.split(maxsplit=1)
+    amount_text = amount_text.replace(",", "")
     float_price = float(amount_text)
     return currency, float_price
 
