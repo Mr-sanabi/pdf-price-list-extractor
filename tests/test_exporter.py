@@ -105,3 +105,33 @@ def test_export_records_unsupported_format(tmp_path):
 
     with pytest.raises(ValueError, match="Unsupported output format"):
         export_records([], output_path)
+
+
+def test_export_records_creates_parent_directories(tmp_path):
+    records = [
+        {
+            "sku": "LMP-1001",
+            "product": "Kanso Desk Lamp",
+            "dimensions": "42 x 18 x 55 cm",
+            "weight": "2.4 kg",
+            "power": "12 W",
+            "price_raw": "PLN 349.00",
+            "currency": "PLN",
+            "price": 349.0,
+        }
+    ]
+
+    output_path = tmp_path / "output" / "reports" / "products.csv"
+
+    export_records(records, output_path)
+
+    assert output_path.exists()
+    assert output_path.parent.exists()
+
+
+def test_export_records_does_not_create_file_for_empty_records(tmp_path):
+    output_path = tmp_path / "output" / "products.csv"
+
+    export_records([], output_path)
+
+    assert not output_path.exists()    

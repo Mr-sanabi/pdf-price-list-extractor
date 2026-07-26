@@ -50,7 +50,9 @@ def export_to_excel(records, output_path):
     workbook.save(output_path)
 
 def export_records(records, output_path):
-    suffix = Path(output_path).suffix.lower()
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    suffix = path.suffix.lower()
 
     if suffix == ".csv":
         export_to_csv(records, output_path)
