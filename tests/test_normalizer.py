@@ -1,6 +1,6 @@
 """Tests for normalizer."""
 
-from pdf_price_extractor.normalizer import row_to_record, clean_text, parse_price, is_valid_record, split_records
+from pdf_price_extractor.normalizer import row_to_record, clean_text, parse_price, is_valid_record, split_records, normalize_record, normalize_records
 
 def test_row_to_record():
     row = [
@@ -71,3 +71,47 @@ def test_split_records():
 
     assert accepted == [valid_record]
     assert rejected == [invalid_record]
+
+
+def test_normalize_record():
+    row = [
+        " LMP-1001 ",
+        "  Kanso   Desk\nLamp ",
+        "42 x 18 x 55 cm",
+        "2.4 kg",
+        "12 W",
+        "PLN 349.00",
+    ]
+
+    result = normalize_record(row)
+
+    assert result == {        
+        "sku": "LMP-1001",
+        "product": "Kanso Desk Lamp",
+        "dimensions": "42 x 18 x 55 cm",
+        "weight": "2.4 kg",
+        "power": "12 W",
+        "price_raw": "PLN 349.00",
+        "currency": "PLN",
+        "price": 349.0,
+    }
+
+
+def test_normalize_records():
+    valid_row = [
+        "LMP-1001",
+        "Kanso Desk Lamp",
+        "42 x 18 x 55 cm",
+        "2.4 kg",
+        "12 W",
+        "PLN 349.00",
+    ]
+
+    invalid_row = valid_row.copy()
+    invalid_row[0] = "   "
+
+    accepted, rejected = normalize_records([valid_row, invalid_row])
+    assert len(accepted) == 1
+    assert len(rejected) == 1
+    assert accepted[0]["currency"] == "PLN"
+    assert accepted[0]["price"] == 349.0

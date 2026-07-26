@@ -45,3 +45,26 @@ def split_records(records):
             rejected.append(record)
 
     return accepted, rejected
+
+
+def normalize_record(row):
+    record = row_to_record(row)
+    for key, value in record.items():
+        record[key] = clean_text(value)
+        
+    currency, price = parse_price(record["price_raw"])
+
+    record["currency"] = currency
+    record["price"] = price
+
+    return record
+
+def normalize_records(rows):
+    normalized_records = []
+    for row in rows:
+        normalized_row = normalize_record(row)
+        normalized_records.append(normalized_row)
+
+    accepted, rejected = split_records(normalized_records)
+
+    return accepted, rejected
