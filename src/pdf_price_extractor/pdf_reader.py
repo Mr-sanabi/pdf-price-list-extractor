@@ -60,7 +60,3 @@ def extract_page_words(pdf_path, page_number):
         words = page.get_text("words")
         return words
 
-words = extract_page_words("tests/fixtures/sample.pdf", 0)
-
-for word in words[:30]:
-    print(word[0], word[1], word[4], word[5], word[6])

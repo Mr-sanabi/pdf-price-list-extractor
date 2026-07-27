@@ -1,5 +1,6 @@
 import argparse
 
+from pdf_price_extractor.pipeline import run_pipeline
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Extract a price table from PDF")
@@ -19,3 +20,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Column boundaries"
     )
     return parser
+
+
+def main():
+    parser = build_parser()
+    args = parser.parse_args()
+
+    pdf_path=args.pdf_path
+    output_path=args.output_path
+    page_number=args.page
+    column_boundaries=args.columns
+
+    accepted, rejected = run_pipeline(pdf_path, output_path, page_number, column_boundaries)
+
+    print(f"Exported: {len(accepted)}")
+    print(f"Rejected: {len(rejected)}")
+
+if __name__ == "__main__":
+    main()
