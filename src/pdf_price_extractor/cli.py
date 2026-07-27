@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from pdf_price_extractor.pipeline import run_pipeline
 
@@ -30,11 +31,36 @@ def main():
     output_path=args.output_path
     page_number=args.page
     column_boundaries=args.columns
+    try:
+        accepted, rejected = run_pipeline(pdf_path, 
+            output_path,
+            page_number, 
+            column_boundaries
+        )
+    except FileNotFoundError:
+        print(
+            f"Error: PDF file not found: {pdf_path}", 
+            file=sys.stderr
+        )
+        return 1
 
-    accepted, rejected = run_pipeline(pdf_path, output_path, page_number, column_boundaries)
+    except ValueError as error:
+        print(
+            f"Error: {error}", 
+            file=sys.stderr
+        )
+        return 1
+
+    except IndexError:
+        print(
+            f"Error: Page {page_number} does not exist", 
+            file=sys.stderr
+        )
+        return 1
 
     print(f"Exported: {len(accepted)}")
     print(f"Rejected: {len(rejected)}")
+    return 0
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
