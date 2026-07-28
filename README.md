@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/readme/banner.png" alt="PDF Price List Extractor — PDF to structured CSV and XLSX data" width="100%">
+  <img src="assets/readme/banner.svg" alt="PDF Price List Extractor — PDF to structured CSV and XLSX data" width="100%">
 </p>
 
 <p align="center">
