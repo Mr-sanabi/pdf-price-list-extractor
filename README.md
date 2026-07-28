@@ -178,7 +178,7 @@ python -m pdf_price_extractor.cli --help
 ```powershell
 python -m pdf_price_extractor.cli `
   tests/fixtures/sample.pdf `
-  output/products.csv `
+  data/output/products.csv `
   --page 0 `
   --columns 170 350 470 550 630
 ```
@@ -188,7 +188,7 @@ python -m pdf_price_extractor.cli `
 ```powershell
 python -m pdf_price_extractor.cli `
   tests/fixtures/sample.pdf `
-  output/products.xlsx `
+  data/output/products.xlsx `
   --page 0 `
   --columns 170 350 470 550 630
 ```
@@ -198,7 +198,7 @@ python -m pdf_price_extractor.cli `
 ```bash
 python -m pdf_price_extractor.cli \
   tests/fixtures/sample.pdf \
-  output/products.csv \
+  data/output/products.csv \
   --page 0 \
   --columns 170 350 470 550 630
 ```
