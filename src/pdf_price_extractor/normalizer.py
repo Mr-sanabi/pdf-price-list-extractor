@@ -1,5 +1,7 @@
 """Normalize prices, currencies, dimensions, and measurement units."""
 
+import re
+
 def row_to_record(row):
     keys = [
         "sku",
@@ -21,7 +23,13 @@ def clean_text(value):
 
 def parse_price(price_raw):
     cleaned_price = clean_text(price_raw)
-    currency, amount_text = cleaned_price.split(maxsplit=1)
+    match = re.fullmatch(r"([^\d\s]+)\s*([\d,.]+)", cleaned_price)
+
+    if not match:
+        raise ValueError(f"Invalid price format: {cleaned_price}")
+
+    currency = match.group(1)
+    amount_text = match.group(2)
     amount_text = amount_text.replace(",", "")
     float_price = float(amount_text)
     return currency, float_price
@@ -62,10 +70,18 @@ def normalize_record(row):
 
 def normalize_records(rows):
     normalized_records = []
+    normalization_rejected = []
+    
     for row in rows:
-        normalized_row = normalize_record(row)
+        try:
+            normalized_row = normalize_record(row)
+        except ValueError:
+            normalization_rejected.append(row)
+            continue
+        
         normalized_records.append(normalized_row)
 
     accepted, rejected = split_records(normalized_records)
+    rejected.extend(normalization_rejected)
 
     return accepted, rejected

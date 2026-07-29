@@ -32,10 +32,16 @@ def test_clean_text():
 
 def test_parse_price():
     result = parse_price("PLN 349.00")
+    invalid_result1 = parse_price("$74.13")
+    invalid_result2 = parse_price("$4,448.56")
+    invalid_result3 = parse_price("€19.99")
 
     assert result == ("PLN", 349.00)
     assert isinstance(result[0], str)
     assert isinstance(result[1], float)
+    assert invalid_result1 == ("$", 74.13)
+    assert invalid_result2 == ("$", 4448.56)
+    assert invalid_result3 == ("€", 19.99)
 
 
 def test_is_valid_record():
@@ -110,8 +116,15 @@ def test_normalize_records():
     invalid_row = valid_row.copy()
     invalid_row[0] = "   "
 
-    accepted, rejected = normalize_records([valid_row, invalid_row])
+    na_row = valid_row.copy()
+    na_row[-1] = "NA"
+
+    defaulted_row = valid_row.copy()
+    defaulted_row[-1] = "DEFAULTED"
+
+
+    accepted, rejected = normalize_records([valid_row, na_row, defaulted_row])
     assert len(accepted) == 1
-    assert len(rejected) == 1
+    assert len(rejected) == 2
     assert accepted[0]["currency"] == "PLN"
     assert accepted[0]["price"] == 349.0
