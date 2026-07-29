@@ -143,12 +143,14 @@ def test_main_passes_custom_header(monkeypatch):
             "200",
             "300",
             "400",
+            "500",
             "--header",
             "ITEM",
             "DESCRIPTION",
-            "UNIT",
-            "PACK",
-            "PRICE",
+            "SIZE",
+            "MASS",
+            "WATTAGE",
+            "COST",
         ],
     )
 
@@ -160,7 +162,39 @@ def test_main_passes_custom_header(monkeypatch):
     assert received["expected_header"] == [
         "ITEM",
         "DESCRIPTION",
-        "UNIT",
-        "PACK",
-        "PRICE",
+        "SIZE",
+        "MASS",
+        "WATTAGE",
+        "COST",
     ]
+
+
+def test_main_rejects_incompatible_custom_header(monkeypatch, capsys):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "pdf-price-extractor",
+            "input.pdf",
+            "output.csv",
+            "--columns",
+            "100",
+            "200",
+            "300",
+            "400",
+            "500",
+            "--header",
+            "ITEM",
+            "DESCRIPTION",
+            "UNIT",
+            "PACK",
+            "PRICE",
+        ],
+    )
+
+    exit_code = cli_module.main()
+    captured = capsys.readouterr()
+
+    assert exit_code == 1
+    assert "Custom headers must contain exactly 6 names" in captured.err
+    assert captured.out == ""

@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from pdf_price_extractor.pipeline import run_pipeline
 import pdf_price_extractor.pipeline as pipeline_module
 
@@ -24,9 +26,10 @@ def test_run_pipeline_passes_expected_header(monkeypatch, tmp_path):
     custom_header = [
         "ITEM",
         "DESCRIPTION",
-        "UNIT",
-        "PACK",
-        "PRICE",
+        "SIZE",
+        "MASS",
+        "WATTAGE",
+        "COST",
     ]
 
     received = {}
@@ -58,3 +61,25 @@ def test_run_pipeline_passes_expected_header(monkeypatch, tmp_path):
     )
 
     assert received["expected_header"] == custom_header
+
+
+def test_run_pipeline_rejects_incompatible_table_schema(tmp_path):
+    pdf_path = FIXTURES_DIR / "sample.pdf"
+    output_path = tmp_path / "output.csv"
+
+    with pytest.raises(ValueError, match="Exactly 5 column boundaries"):
+        run_pipeline(
+            pdf_path,
+            output_path,
+            page_number=0,
+            column_boundaries=[100, 200, 300, 400],
+        )
+
+    with pytest.raises(ValueError, match="exactly 6 names"):
+        run_pipeline(
+            pdf_path,
+            output_path,
+            page_number=0,
+            column_boundaries=[100, 200, 300, 400, 500],
+            expected_header=["ITEM", "DESCRIPTION", "UNIT", "PACK", "PRICE"],
+        )

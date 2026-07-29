@@ -11,7 +11,7 @@
 **A Python extraction pipeline that turns text-based PDF price lists into clean, validated CSV or Excel datasets.**
 
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-35%20passed-brightgreen?logo=pytest&logoColor=white)](#-testing)
+[![Tests](https://img.shields.io/badge/tests-40%20passed-brightgreen?logo=pytest&logoColor=white)](#-testing)
 [![Export](https://img.shields.io/badge/export-CSV%20%7C%20XLSX-217346)](#-outputs)
 [![Status](https://img.shields.io/badge/status-portfolio%20project-orange)](#-purpose)
 
@@ -67,13 +67,13 @@ flowchart LR
 | **Coordinate-based extraction** | Reads positioned PDF words with PyMuPDF |
 | **Row reconstruction** | Groups words by vertical position with a configurable tolerance |
 | **Layout-aware column splitting** | Maps words into columns using supplied X-coordinate boundaries |
-| **Header detection** | Starts extraction after the expected six-column table header |
+| **Configurable header detection** | Accepts custom names for the fixed six-column source schema |
 | **Record normalization** | Cleans whitespace and converts price text into currency and numeric amount |
 | **Acceptance / rejection flow** | Separates valid records from incomplete ones |
 | **CSV and Excel export** | Writes accepted records to `.csv` or `.xlsx` |
 | **Automatic output directories** | Creates missing parent directories before export |
 | **CLI error handling** | Clear errors and non-zero exit codes for common failures |
-| **35-test automated suite** | Core extraction stages and CLI behavior are covered |
+| **40-test automated suite** | Core extraction stages, schema validation, and CLI behavior are covered |
 
 ---
 
@@ -193,6 +193,22 @@ python -m pdf_price_extractor.cli `
   --columns 170 350 470 550 630
 ```
 
+### Use custom source header names
+
+Custom names change how the six source columns are detected; the normalized output
+schema remains unchanged.
+
+```powershell
+python -m pdf_price_extractor.cli `
+  supplier-price-list.pdf `
+  data/output/products.csv `
+  --columns 170 350 470 550 630 `
+  --header ITEM DESCRIPTION SIZE MASS WATTAGE COST
+```
+
+Wrap a header name in quotes when it contains spaces, for example
+`--header ITEM "PRODUCT DESCRIPTION" SIZE MASS WATTAGE COST`.
+
 ### Linux / macOS syntax
 
 ```bash
@@ -212,9 +228,10 @@ python -m pdf_price_extractor.cli \
 | `pdf_path` | Yes | — | Path to the source PDF |
 | `output_path` | Yes | — | Destination ending in `.csv` or `.xlsx` |
 | `--page` | No | `0` | Zero-based page number to process |
-| `--columns` | Yes | — | Ordered X-coordinate boundaries for the source layout |
+| `--columns` | Yes | — | Exactly five ordered X-coordinate boundaries for the source layout |
+| `--header` | No | `SKU PRODUCT DIMENSIONS WEIGHT POWER PRICE` | Exactly six source header names, in field order |
 
-> Invalid output formats, missing files, and nonexistent pages return exit code `1` with a readable error on `stderr`.
+> Invalid schemas, output formats, missing files, and nonexistent pages return exit code `1` with a readable error on `stderr`.
 
 ---
 
@@ -228,6 +245,9 @@ SKU        | PRODUCT | DIMENSIONS | WEIGHT | POWER | PRICE
 ```
 
 These values are **layout-specific PDF coordinates**, not universal widths. The sample values are tuned for [`tests/fixtures/sample.pdf`](tests/fixtures/sample.pdf). A different supplier price list may require different boundaries.
+
+The normalizer uses a fixed six-field product schema, so the CLI requires exactly
+five boundaries and, when `--header` is supplied, exactly six header names.
 
 ---
 
@@ -280,10 +300,10 @@ python -m pytest -v
 ```
 
 ```text
-35 passed ✔
+40 passed ✔
 ```
 
-The suite covers PDF reading, row grouping, column splitting, table extraction, normalization, validation, CSV/XLSX writers, the full pipeline, CLI parsing, and CLI error handling.
+The suite covers PDF reading, row grouping, column splitting, table extraction, normalization, fixed-schema validation, CSV/XLSX writers, the full pipeline, CLI parsing, and CLI error handling.
 
 Run a single module:
 
@@ -295,7 +315,7 @@ python -m pytest tests/test_pipeline.py -v
 
 ## 🛡️ Reliability
 
-Missing-file checks · page-range validation · deterministic row ordering · explicit accepted/rejected paths · stable export fields · automatic output-directory creation · unsupported-format validation · `stderr` error reporting · meaningful process exit codes.
+Missing-file checks · page-range validation · six-column schema validation · deterministic row ordering · explicit accepted/rejected paths · stable export fields · automatic output-directory creation · unsupported-format validation · `stderr` error reporting · meaningful process exit codes.
 
 ---
 
@@ -334,7 +354,7 @@ pdf-price-list-extractor/
 
 - Only text-based PDFs are supported; scanned documents require OCR
 - One page is processed per CLI command
-- The table must use the expected six-column header and field order
+- The table must use the fixed six-column field order; source header names are configurable
 - Column boundaries must be configured for each distinct page layout
 - Price parsing expects a currency token followed by a numeric amount
 - Rejected records are counted but not exported separately
@@ -345,7 +365,7 @@ pdf-price-list-extractor/
 - [ ] Automatic column-boundary detection
 - [ ] OCR fallback for scanned price lists
 - [ ] Multi-page and whole-document extraction
-- [ ] Configurable headers and output schemas
+- [ ] Configurable output schemas
 - [ ] Separate rejected-record report with error reasons
 - [ ] Locale-aware price and decimal parsing
 - [ ] Batch processing for PDF directories

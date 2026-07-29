@@ -99,27 +99,30 @@ def test_extract_table_rows_with_custom_header():
     custom_header = [
         "ITEM",
         "DESCRIPTION",
-        "UNIT",
-        "PACK",
-        "PRICE",
+        "SIZE",
+        "MASS",
+        "WATTAGE",
+        "COST",
     ]
 
-    column_boundaries = [100, 200, 300, 400]
+    column_boundaries = [100, 200, 300, 400, 500]
 
     rows = [
         [
             (10, 0, 0, 0, "ITEM"),
             (110, 0, 0, 0, "DESCRIPTION"),
-            (210, 0, 0, 0, "UNIT"),
-            (310, 0, 0, 0, "PACK"),
-            (410, 0, 0, 0, "PRICE"),
+            (210, 0, 0, 0, "SIZE"),
+            (310, 0, 0, 0, "MASS"),
+            (410, 0, 0, 0, "WATTAGE"),
+            (510, 0, 0, 0, "COST"),
         ],
         [
             (10, 0, 0, 0, "001"),
             (110, 0, 0, 0, "Product A"),
-            (210, 0, 0, 0, "BOX"),
-            (310, 0, 0, 0, "10"),
-            (410, 0, 0, 0, "$74.13"),
+            (210, 0, 0, 0, "10 x 20 cm"),
+            (310, 0, 0, 0, "1 kg"),
+            (410, 0, 0, 0, "10 W"),
+            (510, 0, 0, 0, "$74.13"),
         ],
     ]
 
@@ -130,5 +133,5 @@ def test_extract_table_rows_with_custom_header():
     )
 
     assert result == [
-        ["001", "Product A", "BOX", "10", "$74.13"]
+        ["001", "Product A", "10 x 20 cm", "1 kg", "10 W", "$74.13"]
     ]

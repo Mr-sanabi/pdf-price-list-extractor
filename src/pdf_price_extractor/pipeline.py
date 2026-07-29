@@ -4,6 +4,8 @@ from pdf_price_extractor.table_extractor import extract_table_from_page
 from pdf_price_extractor.normalizer import normalize_records
 from pdf_price_extractor.exporter import export_records
 
+EXPECTED_COLUMN_COUNT = 6
+
 
 def run_pipeline(
         pdf_path,
@@ -12,6 +14,19 @@ def run_pipeline(
         column_boundaries,
         expected_header=None
     ):
+
+    if len(column_boundaries) != EXPECTED_COLUMN_COUNT - 1:
+        raise ValueError(
+            "Exactly 5 column boundaries are required for the six-column schema"
+        )
+
+    if (
+        expected_header is not None
+        and len(expected_header) != EXPECTED_COLUMN_COUNT
+    ):
+        raise ValueError(
+            "Custom headers must contain exactly 6 names for the six-column schema"
+        )
 
     rows = extract_table_from_page(
         pdf_path, 
