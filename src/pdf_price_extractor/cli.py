@@ -40,6 +40,14 @@ def main():
     page_number=args.page
     column_boundaries=args.columns
     expected_header=args.header
+    
+    if (
+        expected_header is not None
+        and len(expected_header) != len(column_boundaries) + 1
+    ):
+        print("Error: --header must contain exactly one more value than --columns.")
+        return 1
+    
     try:
         accepted, rejected = run_pipeline(
             pdf_path,
