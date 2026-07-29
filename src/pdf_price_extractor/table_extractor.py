@@ -1,5 +1,14 @@
 """Extract table-like data from PDF pages."""
 
+DEFAULT_HEADER = [
+    "SKU",
+    "PRODUCT",
+    "DIMENSIONS",
+    "WEIGHT",
+    "POWER",
+    "PRICE",
+]
+
 from pdf_price_extractor.pdf_reader import extract_page_words
 
 def group_words_into_rows(words, y_tolerance=3):
@@ -54,17 +63,13 @@ def split_row_into_columns(row, column_boundaries):
     return [" ".join(column) for column in columns]
 
 
-def extract_table_rows(rows, column_boundaries):
+def extract_table_rows(rows, column_boundaries, expected_header=None):
+
+    if expected_header is None:
+        expected_header = DEFAULT_HEADER
+
     table_rows = []
     header_found = False
-    expected_header = [
-        "SKU",
-        "PRODUCT",
-        "DIMENSIONS",
-        "WEIGHT",
-        "POWER",
-        "PRICE",
-    ]
 
     for row in rows:
         columns = split_row_into_columns(row, column_boundaries)
@@ -75,7 +80,7 @@ def extract_table_rows(rows, column_boundaries):
 
             continue
 
-        if columns[0] and columns[5]:
+        if columns[0] and columns[-1]:
             table_rows.append(columns)
 
     return table_rows
@@ -86,8 +91,14 @@ def extract_table_from_page(
     page_number,
     column_boundaries,
     y_tolerance=3,
+    expected_header=None,
 ):
     words = extract_page_words(pdf_path, page_number)
     rows = group_words_into_rows(words, y_tolerance)
-    table_rows = extract_table_rows(rows, column_boundaries)
+
+    table_rows = extract_table_rows(
+        rows,
+        column_boundaries,
+        expected_header=expected_header,
+    )
     return table_rows

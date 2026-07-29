@@ -2,6 +2,15 @@ from pdf_price_extractor.table_extractor import group_words_into_rows, split_row
 from pdf_price_extractor.pdf_reader import extract_page_words
 from pathlib import Path
 
+expected_header = [
+    "SKU",
+    "PRODUCT",
+    "DIMENSIONS",
+    "WEIGHT",
+    "POWER",
+    "PRICE",
+    ]
+
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
 def test_group_words_into_rows():
@@ -56,12 +65,14 @@ def test_split_row_into_columns():
     ]
 
 def test_extract_table_rows_from_pdf():
+
     pdf_path = FIXTURES_DIR / "sample.pdf"
     words = extract_page_words(pdf_path, 0)
     rows = group_words_into_rows(words, y_tolerance=3)
     result = extract_table_rows(
         rows,
         [170, 350, 470, 550, 630],
+        expected_header,
     )
     assert len(result) == 5
 
@@ -78,8 +89,46 @@ def test_extract_table_rows_from_pdf():
 
 def test_extract_table_from_page():
     pdf_path = FIXTURES_DIR / "sample.pdf"
-    result = extract_table_from_page(pdf_path, page_number=0, column_boundaries=[170, 350, 470, 550, 630], y_tolerance=3)
+    result = extract_table_from_page(pdf_path, page_number=0, column_boundaries=[170, 350, 470, 550, 630], expected_header=expected_header, y_tolerance=3)
     assert len(result) == 5
     assert result[0][0] == "LMP-1001"
     assert result[-1][0] == "SHF-5205"
     assert all(len(product) == 6 for product in result)
+
+def test_extract_table_rows_with_custom_header():
+    custom_header = [
+        "ITEM",
+        "DESCRIPTION",
+        "UNIT",
+        "PACK",
+        "PRICE",
+    ]
+
+    column_boundaries = [100, 200, 300, 400]
+
+    rows = [
+        [
+            (10, 0, 0, 0, "ITEM"),
+            (110, 0, 0, 0, "DESCRIPTION"),
+            (210, 0, 0, 0, "UNIT"),
+            (310, 0, 0, 0, "PACK"),
+            (410, 0, 0, 0, "PRICE"),
+        ],
+        [
+            (10, 0, 0, 0, "001"),
+            (110, 0, 0, 0, "Product A"),
+            (210, 0, 0, 0, "BOX"),
+            (310, 0, 0, 0, "10"),
+            (410, 0, 0, 0, "$74.13"),
+        ],
+    ]
+
+    result = extract_table_rows(
+        rows,
+        column_boundaries,
+        expected_header=custom_header,
+    )
+
+    assert result == [
+        ["001", "Product A", "BOX", "10", "$74.13"]
+    ]
