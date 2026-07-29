@@ -10,9 +10,16 @@ def run_pipeline(
         output_path,
         page_number,
         column_boundaries,
+        expected_header=None
     ):
 
-    rows = extract_table_from_page(pdf_path, page_number, column_boundaries)
+    rows = extract_table_from_page(
+        pdf_path, 
+        page_number, 
+        column_boundaries,
+        expected_header=expected_header,
+    )
+    
     accepted, rejected = normalize_records(rows)
     export_records(accepted, output_path)
 

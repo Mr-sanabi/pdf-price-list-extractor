@@ -1,6 +1,7 @@
 import sys
 
 from pdf_price_extractor.cli import build_parser, main
+import pdf_price_extractor.cli as cli_module
 
 def test_build_parser():
     parser = build_parser()
@@ -109,3 +110,57 @@ def test_main_handles_nonexistent_page(monkeypatch, capsys):
 
     assert exit_code == 1
     assert "Error: Page 99 does not exist" in captured.err
+
+
+def test_main_passes_custom_header(monkeypatch):
+    received = {}
+
+    def fake_run_pipeline(
+        pdf_path,
+        output_path,
+        page_number,
+        column_boundaries,
+        expected_header=None,
+    ):
+        received["expected_header"] = expected_header
+        return [], []
+
+    monkeypatch.setattr(
+        cli_module,
+        "run_pipeline",
+        fake_run_pipeline,
+    )
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "pdf-price-extractor",
+            "input.pdf",
+            "output.xlsx",
+            "--columns",
+            "100",
+            "200",
+            "300",
+            "400",
+            "--header",
+            "ITEM",
+            "DESCRIPTION",
+            "UNIT",
+            "PACK",
+            "PRICE",
+        ],
+    )
+
+
+    exit_code = cli_module.main()
+
+  
+    assert exit_code == 0
+    assert received["expected_header"] == [
+        "ITEM",
+        "DESCRIPTION",
+        "UNIT",
+        "PACK",
+        "PRICE",
+    ]

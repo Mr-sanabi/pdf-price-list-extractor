@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from pdf_price_extractor.pipeline import run_pipeline
+import pdf_price_extractor.pipeline as pipeline_module
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
@@ -18,3 +19,42 @@ def test_run_pipeline_exports_normalized_records(tmp_path):
     assert len(accepted) == 5
     assert len(rejected) == 0
     assert output_path.exists()
+
+def test_run_pipeline_passes_expected_header(monkeypatch, tmp_path):
+    custom_header = [
+        "ITEM",
+        "DESCRIPTION",
+        "UNIT",
+        "PACK",
+        "PRICE",
+    ]
+
+    received = {}
+
+    def fake_extract_table_from_page(
+        pdf_path,
+        page_number,
+        column_boundaries,
+        expected_header=None,
+    ):
+        received["expected_header"] = expected_header
+        return []
+
+    monkeypatch.setattr(
+        pipeline_module,
+        "extract_table_from_page",
+        fake_extract_table_from_page,
+    )
+
+    pdf_path = FIXTURES_DIR / "sample.pdf"
+    output_path = tmp_path / "output.xlsx"
+
+    pipeline_module.run_pipeline(
+        pdf_path,
+        output_path,
+        page_number=0,
+        column_boundaries=[170, 350, 470, 550, 630],
+        expected_header=custom_header,
+    )
+
+    assert received["expected_header"] == custom_header

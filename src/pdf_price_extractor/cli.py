@@ -7,6 +7,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Extract a price table from PDF")
     parser.add_argument("pdf_path", type=str, help="Path to the PDF file")
     parser.add_argument("output_path", type=str, help="Path to the output_path")
+    
     parser.add_argument(
         "--page",
         type=int,
@@ -20,6 +21,13 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="Column boundaries"
     )
+    parser.add_argument(
+        "--header",
+        nargs="+",
+        default=None,
+        help="Expected table header names",
+    )
+
     return parser
 
 
@@ -31,11 +39,14 @@ def main():
     output_path=args.output_path
     page_number=args.page
     column_boundaries=args.columns
+    expected_header=args.header
     try:
-        accepted, rejected = run_pipeline(pdf_path, 
+        accepted, rejected = run_pipeline(
+            pdf_path,
             output_path,
-            page_number, 
-            column_boundaries
+            page_number,
+            column_boundaries,
+            expected_header=expected_header,
         )
     except FileNotFoundError:
         print(
